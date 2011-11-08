@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="prompt-step-plugin" default="dist" basedir=".">
+  <description>Pentaho Data Integration Prompt Step Plugin</description>
+
+  <!-- Global properties -->
+  <property name="build"      location="classes"/>
+  <property name="dist"       location="dist"/>
+  <property name="extradist"  location="distrib"/>
+  <property name="install"    location="installdir"/>
+  <property name="libext"     location="libext"/>
+  <property name="libswt"     location="libswt"/>
+  <property name="src"        location="src"/>
+  <property name="withsource" location="true"/>
+
+  <target name="init" description="Create timestamp and build directories">
+    <tstamp/>
+
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="buildinfo" depends="init">
+    <tstamp>
+      <format property="buildtime"
+          pattern="yyyy-MM-dd'T'HH:mm:ss'Z'"
+          timezone="UTC" />
+    </tstamp>
+
+    <exec executable="git" outputproperty="scmversion">
+      <arg value="describe"/>
+      <arg value="--always"/>
+      <arg value="--dirty"/>
+    </exec>
+
+    <propertyfile file="${build}/build.properties"
+        comment="Generated during build process to identify the build">
+      <entry key="buildtime" value="${buildtime}"/>
+      <entry key="scmversion" value="${scmversion}"/>
+      <entry key="antversion" value="${ant.version}"/>
+      <entry key="antjavaversion" value="${ant.java.version}"/>
+    </propertyfile>
+  </target>
+
+  <target name="compile" depends="init, buildinfo" description="Compile the project" >
+    <javac srcdir="${src}" destdir="${build}" includeantruntime="false">
+      <classpath>
+        <fileset dir="${libext}"        includes="*.jar"/>
+        <fileset dir="${libswt}"        includes="*.jar"/>
+        <fileset dir="${libswt}/win32/" includes="*.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="resources"
+      depends="resources-extra, resources-nonsource, resources-projinfo, resources-source"
+      description="Copy all resources to the build dir"/>
+
+  <target name="resources-extra" depends="init"
+      description="Copy extra files for distribution to build dir" >
+    <copy todir="${build}">
+      <fileset dir="${extradist}"/>
+    </copy>
+  </target>
+
+  <target name="resources-nonsource" depends="init"
+      description="Copy non-source files in source tree to build dir" >
+    <copy todir="${build}">
+      <fileset dir="${src}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="resources-projinfo" depends="init"
+      description="Copy project information files to build dir" >
+    <copy todir="${build}">
+      <fileset dir="." includes="*.txt"/>
+    </copy>
+  </target>
+
+  <target name="resources-source" depends="init" if="withsource"
+      description="Copy source files to build dir" >
+    <copy todir="${build}">
+      <fileset file=".classpath"/>
+      <fileset file=".project"/>
+      <fileset dir="." includes="*.jardesc"/>
+      <fileset dir="${src}" includes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="compile, resources"
+      description="Generate a JAR file for distribution">
+    <mkdir dir="${dist}"/>
+
+    <jar jarfile="${dist}/${ant.project.name}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="install" depends="dist"
+      description="Install the distribution" >
+    <copy todir="${installdir}">
+      <fileset dir="${dist}"/>
+    </copy>
+  </target>
+
+  <target name="clean"  description="clean up generated files" >
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
+<!-- vi: set sts=2 sw=2 et: -->

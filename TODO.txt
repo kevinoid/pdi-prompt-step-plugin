@@ -1,0 +1,31 @@
+Desired Features for PDI Prompt Step Plugin
+===========================================
+
+Below is a list of some of the features that would fit well with the design
+goals of this plugin but which have not yet been implemented.  They are ideas
+for future improvements and anyone with interest is encouraged to consider
+implementing any of these features:
+
+# Text-based prompt strategies
+
+Such strategies could be chosen for transformations which are intended to be
+run from the command-line.
+
+# Remote prompt strategies
+
+There is currently no support for remote execution.  It would be great
+if there were some way to prompt remotely.  I (Kevin) have no experience with
+remote transformations and it is not a priority for me, but I recognize this
+may be highly valuable for users where this is a common use case.
+
+# Preserve types for choice-based prompts
+
+Currently all prompt results are String values.  I (Kevin) contend that this
+is the correct result for text-entry prompts and that any data conversion
+should be done by subsequent steps.  However, for choice-based prompts it would
+be preferable to preserve the type of the choice values to avoid the need to
+re-convert them back to their original types.
+
+The choice-based prompt strategies are written to support different value
+data-types using generics, but the code for utilizing the strategies currently
+treats all values as strings and store the resulting data in a string field.

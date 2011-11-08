@@ -1,0 +1,3 @@
+2011-11-08  Kevin Locke <klocke@digitalenginesoftware.com>
+
+    * *.*: Initial Preview Release (0.1.0)
